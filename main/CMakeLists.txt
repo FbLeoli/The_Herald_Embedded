@@ -1,2 +1,2 @@
-idf_component_register(SRCS "main.c" "info.c"
+idf_component_register(SRCS "chip_info.c" "main.c"
                     INCLUDE_DIRS "./include")

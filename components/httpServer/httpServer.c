@@ -1,53 +1,85 @@
-/* Simple HTTP server
-   Creates GET and POST handlers for the web server */
 #include <stdio.h>
-#include <esp_event.h>
 #include <esp_log.h>
-#include <esp_system.h>
-#include <nvs_flash.h>
-#include <sys/param.h>
-#include "nvs_flash.h"
-#include "esp_netif.h"
-#include "esp_eth.h"
-#include "protocol_examples_common.h"
-#include "esp_tls_crypto.h"
-#include <httpServer.h>
+#include "httpServer.h"
 
-static const char *TAG == "httpServer";
+#ifndef MIN
+#define MIN(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
 
-#if CONFIG_BASIC_AUTH
+static const char* TAG_SERVER = "HTTPServer";
 
-typedef struct
-{
-    char *username;
-    char *password;
-} basic_auth_info_t; //Information to authenticate
-
-#define HTTPD_401 "401 UNAUTHORIZED" // HTTP 401 RESPONSE
-
-static char *http_auth_basic(const char *username, const char *password)
-{
-    int out;
-    char *user_info = NULL;
-    char *digest = NULL;
-    size_t n = 0;
-
-    asprintf(&user_info, "%s:%s", username, password); //print username:password in the string user_info
-    if (!user_info)
-    { //if there is no space to alloc in memory (part of asprintf)
-        ESP_LOGE(TAG, "No enough memory for user information");
-        return null;
-    }
-    esp_crypto_base64_encode(NULL, 0, &n, (const unsigned char *)user_info, strlen(user_info)); //Encode data of user_info
-
-    digest = calloc(1, 6 + n + 1); //Allocates a block of memory for an array of 1 element with 6 + n + 1 bytes long
-    if (digest)
-    {
-        strcpy(digest, "Basic ");
-        esp_crypto_base64_encode((unsigned char *)digest + 6, n, (size_t *)&out, (const unsigned char *)user_info, strlen(user_info));
-    }
-    free(user_info);
-    return digest;
+/* An HTTP GET handler */
+static esp_err_t hello_get_handler(httpd_req_t* req) {
+    const char resp[] = "URI GET Response";
+    //API to send a complete HTTP response
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    ESP_LOGI(TAG_SERVER, "Sended Hello Handler Response");
+    return ESP_OK;
 }
 
-#endif
+/* URI handler structure for GET /hello */
+static const httpd_uri_t hello = {
+    .uri = "/hello",
+    .method = HTTP_GET,
+    .handler = hello_get_handler,
+    .user_ctx = NULL
+};
+
+static esp_err_t echo_post_handler(httpd_req_t* req) {
+    char buf[100];
+    //Truncate if content length is larger than the buffer
+    size_t recv_size = MIN(req->content_len, sizeof(buf));
+    int ret = httpd_req_recv(req, buf, recv_size);
+
+    if (ret <= 0) {
+        if (ret == 0) {
+            ESP_LOGI(TAG_SERVER, "Connection closed by peer");
+        }
+        if (ret == HTTPD_SOCK_ERR_TIMEOUT) {
+            /* In case of timeout we
+             * respond with an HTTP 408 (Request Timeout) error */
+            httpd_resp_send_408(req);
+            ESP_LOGI(TAG_SERVER, "Timeout");
+        }
+        return ESP_FAIL;
+    }
+    const char resp[] = "URI POST Response";
+    ESP_LOGI(TAG_SERVER, "SUCCESSFUL POST");
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+static const httpd_uri_t echo = {
+    .uri = "/echo",
+    .method = HTTP_POST,
+    .handler = echo_post_handler,
+    .user_ctx = NULL
+};
+
+//Function to start the webserver
+httpd_handle_t start_webserver(void) {
+    /* Generate default configuration */
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+    /* Empty handle to esp_http_server */
+    httpd_handle_t server = NULL;
+
+    // Start the httpd server
+    ESP_LOGI(TAG_SERVER, "Starting server on port: '%d'", config.server_port);
+
+    /* Start the httpd server */
+    if (httpd_start(&server, &config) == ESP_OK) {
+        /* Register URI handlers */
+        httpd_register_uri_handler(server, &echo);
+        httpd_register_uri_handler(server, &hello);
+        return server;
+    }
+    /* If server failed to start, handle will be NULL */
+    ESP_LOGI(TAG_SERVER, "Error starting server!");
+    return NULL;
+}
+
+//Function to stop the webserver
+void stop_webserver(httpd_handle_t server) {
+    httpd_stop(server);
+}

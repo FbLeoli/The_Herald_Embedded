@@ -3,6 +3,7 @@
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
+
 void print_chip_info()
 {
     /* Print chip information */
