@@ -1,14 +1,14 @@
-menu "PROJECT - WIFI Configuration"
+menu "THE HARALD - WIFI Configuration"
 
     config ESP_WIFI_SSID
         string "WiFi SSID"
-        default "myssid"
+        default "SOCIEDADE_DO_ABACAXI"
         help
             SSID (network name) for the example to connect to.
 
     config ESP_WIFI_PASSWORD
         string "WiFi Password"
-        default "mypassword"
+        default "100s3nh44"
         help
             WiFi password (WPA or WPA2) for the example to use.
 

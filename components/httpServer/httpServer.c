@@ -10,7 +10,7 @@ static const char* TAG_SERVER = "HTTPServer";
 
 /* An HTTP GET handler */
 static esp_err_t hello_get_handler(httpd_req_t* req) {
-    const char resp[] = "URI GET Response";
+    const char resp[] = "URI GET Response \n ";
     //API to send a complete HTTP response
     httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
     ESP_LOGI(TAG_SERVER, "Sended Hello Handler Response");

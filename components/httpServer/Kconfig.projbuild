@@ -1,4 +1,4 @@
-menu "PROJECT - HTTP_SERVER Configuration"
+menu "THE HARALD - HTTP_SERVER Configuration"
 
     config HTTP_BASIC_AUTH
         bool "Basic Authentication"
