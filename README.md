@@ -6,20 +6,35 @@ Next, I will try to turn this server in a WebSocket Server, and then so on.
 Below is short explanation of remaining files in the project folder.
 
 ```
-├── CMakeLists.txt
-├── components
-|   └──httpServer
-|       ├── include
-|       |   └── httpServer.h
-│       ├── CMakeLists.txt
-│       ├── httpServer.c
-|       └── Kconfig.projbuild
-├── main
-|   ├── include
-|   |   └── info.h
-│   ├── CMakeLists.txt
-│   └── main.c
-└── README.md                  This is the file you are currently reading
+📦components
+ ┣ 📂ble
+ ┃ ┣ 📂include
+ ┃ ┃ ┗ 📜ble.h
+ ┃ ┣ 📜CMakeLists.txt
+ ┃ ┣ 📜Kconfig.projbuild
+ ┃ ┗ 📜ble.c
+ ┣ 📂httpServer
+ ┃ ┣ 📂include
+ ┃ ┃ ┗ 📜httpServer.h
+ ┃ ┣ 📜CMakeLists.txt
+ ┃ ┣ 📜Kconfig.projbuild
+ ┃ ┗ 📜httpServer.c
+ ┗ 📂wifiStation
+ ┃ ┣ 📂include
+ ┃ ┃ ┗ 📜wifiStation.h
+ ┃ ┣ 📜CMakeLists.txt
+ ┃ ┣ 📜Kconfig.projbuild
+ ┃ ┗ 📜wifiStation.c
+ 📦main
+ ┣ 📂include
+ ┃ ┣ 📜info.h
+ ┃ ┗ 📜translate.h
+ ┣ 📜CMakeLists.txt
+ ┣ 📜chip_info.c
+ ┣ 📜main.c
+ ┗ 📜translate.c
+ 📜CMakeLists.txt
+ 📜README.md -> This is the file that you're currently reading
 ```
 
 This project does not contains Makefile and component.mk files, used for the legacy Make based build system.
