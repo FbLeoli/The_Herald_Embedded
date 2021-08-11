@@ -107,7 +107,7 @@ const char *alfa2morse(char *phrase)
     strupr(phrase);
     int len = 0;
     static char inMorse[500] = "";
-    strcpy(inMorse, " ");
+    strcpy(inMorse, "");
     do
     {
         for (int i = 2; i < sizeof(letters); i++)

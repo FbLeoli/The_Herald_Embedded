@@ -11,7 +11,6 @@ enum
     IDX_SVC,        //Service index
     IDX_CHAR_A,     //Characteristic A index
     IDX_CHAR_VAL_A, //Characteristic A value index
-    IDX_CHAR_CFG_A, //Characteristic A configuration index
 
     HRS_IDX_NB, //Table elements
 };

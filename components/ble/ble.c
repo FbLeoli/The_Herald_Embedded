@@ -19,7 +19,7 @@
 #define PROFILE_NUM 1
 #define PROFILE_APP_IDX 0
 #define ESP_APP_ID 0x55
-#define SAMPLE_DEVICE_NAME "HAROLD"
+#define SAMPLE_DEVICE_NAME "HERALD"
 #define SVC_INST_ID 0
 
 /* The max length of characteristic value. When the GATT client performs a write or prepare write operation,
@@ -63,7 +63,6 @@ static uint8_t raw_scan_rsp_data[] = {
 #else
 static uint8_t service_uuid[16] = {
     /* LSB <--------------------------------------------------------------------------------> MSB */
-    //first uuid, 16bit, [12],[13] is the value
     0xfb,
     0x34,
     0x9b,
@@ -161,11 +160,9 @@ static const uint16_t GATTS_CHAR_UUID_TEST_A = 0xFF01;
 
 static const uint16_t primary_service_uuid = ESP_GATT_UUID_PRI_SERVICE;
 static const uint16_t character_declaration_uuid = ESP_GATT_UUID_CHAR_DECLARE;
-static const uint16_t character_client_config_uuid = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
 static const uint8_t char_prop_read_write_notify = ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-static const uint8_t heart_measurement_ccc[2] = {0x00, 0x00};
 //static const uint8_t char_value[4] = {0x11, 0x22, 0x33, 0x44};
-static const char char_value[500] = "TESTE";
+static const char char_value[500] = "Mensagem em Morse";
 /* Full Database Description - Used to add attributes into the database */
 static const esp_gatts_attr_db_t gatt_db[HRS_IDX_NB] =
     {
@@ -180,10 +177,6 @@ static const esp_gatts_attr_db_t gatt_db[HRS_IDX_NB] =
         /* Characteristic Value */
         [IDX_CHAR_VAL_A] =
             {{ESP_GATT_AUTO_RSP}, {ESP_UUID_LEN_16, (uint8_t *)&GATTS_CHAR_UUID_TEST_A, ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, GATTS_DEMO_CHAR_VAL_LEN_MAX, sizeof(char_value), (uint8_t *)char_value}},
-
-        /* Client Characteristic Configuration Descriptor */
-        [IDX_CHAR_CFG_A] =
-            {{ESP_GATT_AUTO_RSP}, {ESP_UUID_LEN_16, (uint8_t *)&character_client_config_uuid, ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, sizeof(uint16_t), sizeof(heart_measurement_ccc), (uint8_t *)heart_measurement_ccc}},
 };
 
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
@@ -390,43 +383,6 @@ static void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_
             // the data length of gattc write  must be less than GATTS_DEMO_CHAR_VAL_LEN_MAX.
             ESP_LOGI(GATTS_TAG, "GATT_WRITE_EVT, handle = %d, value len = %d, value :", param->write.handle, param->write.len);
             esp_log_buffer_hex(GATTS_TAG, param->write.value, param->write.len);
-            if (handle_table[IDX_CHAR_CFG_A] == param->write.handle && param->write.len == 2)
-            {
-                uint16_t descr_value = param->write.value[1] << 8 | param->write.value[0];
-                if (descr_value == 0x0001)
-                {
-                    ESP_LOGI(GATTS_TAG, "notify enable");
-                    uint8_t notify_data[15];
-                    for (int i = 0; i < sizeof(notify_data); ++i)
-                    {
-                        notify_data[i] = i % 0xff;
-                    }
-                    //the size of notify_data[] need less than MTU size
-                    esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, handle_table[IDX_CHAR_VAL_A],
-                                                sizeof(notify_data), notify_data, false);
-                }
-                else if (descr_value == 0x0002)
-                {
-                    ESP_LOGI(GATTS_TAG, "indicate enable");
-                    uint8_t indicate_data[15];
-                    for (int i = 0; i < sizeof(indicate_data); ++i)
-                    {
-                        indicate_data[i] = i % 0xff;
-                    }
-                    //the size of indicate_data[] need less than MTU size
-                    esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, handle_table[IDX_CHAR_VAL_A],
-                                                sizeof(indicate_data), indicate_data, true);
-                }
-                else if (descr_value == 0x0000)
-                {
-                    ESP_LOGI(GATTS_TAG, "notify/indicate disable ");
-                }
-                else
-                {
-                    ESP_LOGE(GATTS_TAG, "unknown descr value");
-                    esp_log_buffer_hex(GATTS_TAG, param->write.value, param->write.len);
-                }
-            }
             /* send response when param->write.need_rsp is true*/
             if (param->write.need_rsp)
             {

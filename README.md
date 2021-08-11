@@ -1,9 +1,9 @@
-# _The Embedded Project_
+# The Herald
 
-I don't even know what I will do in this project but, for now, I'm trying to use the ESP 32 as a HTTP Server.
-Next, I will try to turn this server in a WebSocket Server, and then so on.
+## _An ESP-32 project to convert Alphanumeric Characters to Morse_
 
-Below is short explanation of remaining files in the project folder.
+The project is an HTTP server, using the esp-idf API, produced by Espressif itself, which will be located directly on the ESP-32, and uses two peripherals: wi-fi, to locate itself on the network and receive the information posted on the server, and low-energy bluetooth, to transfer this information via a GATT table to nearby devices. The project focuses mainly on ESP, due to the character of the subject, so if it were implemented, the HTTP client side could be developed, through a web page, and the bluetooth client, a device that would handle the received information and transform it into planned vibrations. In this case, the terminal was used to demonstrate the HTTP methods and the nRF Connect application, to observe the BLE information.
+As for the design organization, only the ESP-IDF API was used, together with the text editor VSCode and the Espressif extension. Several components were used to separate and modularize the project, as is Espressif's recommendation. One for the HTTP server, another for bluetooth and the third for wi-fi management. Below, the project's file tree:
 
 ```
 📦components

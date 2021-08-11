@@ -29,7 +29,7 @@ static const httpd_uri_t hello = {
     .handler = hello_get_handler,
     .user_ctx = NULL};
 
-static esp_err_t echo_post_handler(httpd_req_t *req)
+static esp_err_t alpha_post_handler(httpd_req_t *req)
 {
     size_t recv_size = MIN(req->content_len, sizeof(inAlpha));
     int ret = httpd_req_recv(req, inAlpha, recv_size);
@@ -59,7 +59,7 @@ static esp_err_t echo_post_handler(httpd_req_t *req)
 static const httpd_uri_t echo = {
     .uri = "/echo",
     .method = HTTP_POST,
-    .handler = echo_post_handler,
+    .handler = alpha_post_handler,
     .user_ctx = NULL};
 
 //Function to start the webserver
